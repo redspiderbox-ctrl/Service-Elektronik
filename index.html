@@ -1,892 +1,612 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Surat Jalan</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>KiosKu Pro - Kasir, Stok, Excel & Laba</title>
+    <!-- SheetJS (XLSX) untuk export/import Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+        }
 
-<!-- Library untuk Export Excel -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- Library untuk Export PDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        body {
+            background: #f0f4f8;
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-<style>
+        .dashboard {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
 
-:root {
-    --primary-color: #2563eb;
-    --text-color: #1f2937;
-    --bg-light: #f8fafc;
-    --border-color: #e5e7eb;
-    --white: #ffffff;
-}
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0a2f25, #145c48);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 32px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 12px 18px -8px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .badge-pro {
+            background: #f5b042;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            color: #1e2a2a;
+        }
+        .date-time {
+            background: #1e6b55;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
 
-body{
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin:20px;
-    background-color: #f1f5f9;
-    font-size: 13px;
-    color: var(--text-color);
-}
+        /* Kartu Ringkasan Keuangan */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 18px 20px;
+            box-shadow: 0 5px 14px rgba(0,0,0,0.05);
+            border-left: 6px solid;
+        }
+        .card-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 10px;
+        }
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1f2937;
+        }
+        .card-sub {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+        .card-1 { border-left-color: #2b7a62; }
+        .card-2 { border-left-color: #f59e0b; }
+        .card-3 { border-left-color: #10b981; }
+        .card-4 { border-left-color: #3b82f6; }
+        .card-5 { border-left-color: #ef4444; }
 
-.container-utama {
-    max-width: 1100px; 
-    margin: 0 auto;
-    background-color: var(--white);
-    padding: 30px 40px;
-    border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    box-sizing: border-box;
-}
+        /* Layout 2 kolom utama */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+        }
 
-h2{
-    text-align:center;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    font-size: 18px;
-    margin-top: 0;
-    letter-spacing: 1px;
-    color: var(--text-color);
-    font-weight: 700;
-}
+        /* Panel Kasir */
+        .kasir-panel, .stok-panel {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .panel-title {
+            background: #fafcff;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e9eef3;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .cart-area, .stock-area {
+            padding: 20px;
+        }
 
-.kop-surat {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--primary-color);
-}
+        .select-item {
+            background: #f9fafb;
+            border-radius: 24px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .form-row select, .form-row input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 60px;
+            border: 1px solid #d1d9e8;
+            font-size: 0.9rem;
+        }
+        .btn-add {
+            background: #145c48;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 60px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-add:hover { background: #0f4637; transform: scale(0.97); }
 
-.kop-logo {
-    width: 80px; 
-    height: auto;
-    margin-right: 20px;
-    object-fit: contain;
-}
+        .cart-table-container { overflow-x: auto; margin: 16px 0; }
+        .cart-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .cart-table th { background: #f1f5f9; padding: 12px 8px; text-align: left; }
+        .cart-table td { padding: 10px 8px; border-bottom: 1px solid #ecf3fa; }
+        .qty-control { display: flex; align-items: center; gap: 8px; }
+        .qty-control button { background: #e4e7eb; border: none; width: 28px; border-radius: 30px; cursor: pointer; font-weight: bold; }
+        .remove-item { background: #fee2e2; border: none; padding: 5px 12px; border-radius: 30px; color: #b91c1c; cursor: pointer; font-weight: 600; }
+        .total-section { text-align: right; margin-top: 16px; border-top: 2px dashed #cbd5e1; padding-top: 16px; }
+        .total-line { font-size: 1.6rem; font-weight: 800; color: #145c48; }
+        .btn-pay { background: #2b7a62; width: 100%; padding: 14px; border-radius: 40px; font-weight: bold; color: white; border: none; margin-top: 12px; cursor: pointer; font-size: 1rem; }
 
-.kop-teks {
-    flex-grow: 1;
-}
+        /* Stok panel + tambah barang + area excel */
+        .stok-header {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            padding: 12px 20px;
+            background: #fefcf5;
+            gap: 12px;
+            border-bottom: 1px solid #e9eef3;
+        }
+        .add-stock-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .add-stock-form input { padding: 8px 12px; border-radius: 40px; border: 1px solid #ccc; }
+        .btn-small { background: #145c48; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; font-weight: 500; }
+        .excel-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: #eef2ff;
+            padding: 8px 16px;
+            border-radius: 60px;
+        }
+        .excel-actions button {
+            background: #1e40af;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .excel-actions label {
+            background: #4b5563;
+            padding: 6px 16px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .excel-actions input[type="file"] { display: none; }
+        .stock-table-wrapper { overflow-x: auto; padding: 0 20px 20px 20px; max-height: 400px; overflow-y: auto; }
+        .stock-table { width: 100%; border-collapse: collapse; }
+        .stock-table th, .stock-table td { padding: 10px 6px; text-align: left; border-bottom: 1px solid #edf2f7; font-size: 0.85rem; }
+        .stock-badge { background: #e0f2e9; padding: 4px 10px; border-radius: 30px; font-weight: 600; }
+        .low-stock { background: #ffdede; color: #b91c1c; }
+        .btn-stock-act { background: #eef2ff; border: none; padding: 4px 10px; border-radius: 30px; margin: 0 2px; cursor: pointer; }
+        .btn-delete { background: #ffe4e4; color: #b91c1c; }
 
-.kop-teks h1 {
-    margin: 0;
-    font-size: 22px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 800;
-    color: var(--primary-color);
-}
-
-.kop-teks p {
-    margin: 3px 0 0 0;
-    font-size: 12px;
-    color: #64748b;
-    line-height: 1.5;
-}
-
-.info-container {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr 1.5fr;
-    gap: 20px;
-    margin-bottom: 10px; 
-    background-color: var(--bg-light);
-    padding: 15px 20px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-}
-
-.info-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.label-text {
-    margin-bottom: 6px;
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
-    color: #64748b;
-}
-
-.input-box {
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 8px;
-    font-size: 13px;
-    font-family: inherit;
-    width: 100%;
-    box-sizing: border-box;
-    background: var(--white);
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-.input-box:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.kepada-section {
-    margin-bottom: 15px;
-    background-color: var(--bg-light);
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.kepada-section .label-text {
-    margin-bottom: 0;
-    white-space: nowrap;
-}
-
-.kepada-section .input-box {
-    border: none;
-    border-bottom: 1px solid var(--border-color);
-    border-radius: 0;
-    background: transparent;
-    font-weight: 600;
-}
-
-.form {
-    margin-top: 20px;
-    padding: 15px 20px;
-    background: var(--bg-light);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    display: flex;
-    flex-wrap: nowrap; 
-    gap: 15px;
-    align-items: center; 
-}
-
-.form input {
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    font-size: 13px;
-    transition: all 0.2s;
-}
-
-.form input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-#nama { flex-grow: 1; min-width: 250px;}
-#qty, #p, #l, #t { width: 60px; text-align: center; }
-#colly { width: 70px; text-align: center; }
-#ket { flex-grow: 1; min-width: 150px; }
-
-table{
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 5px;
-    font-size: 12px; 
-    border: 1px solid #d1d5db;
-}
-
-th, td {
-    padding: 8px 5px;
-    text-align: center;
-    vertical-align: middle;
-    border: 1px solid #d1d5db;
-}
-
-.editable {
-    cursor: pointer;
-    min-width: 20px;
-    display: inline-block;
-}
-.editable:hover {
-    background-color: #e0f2fe;
-    color: #0284c7;
-}
-.editable:focus {
-    outline: 2px solid var(--primary-color);
-    background-color: #fff;
-}
-
-td.nama-cell, td.ket-cell {
-    text-align: left !important;
-    white-space: nowrap; 
-}
-
-tbody tr:nth-child(even) {
-    background-color: #f8fafc;
-}
-
-tbody tr:hover {
-    background-color: #f1f5f9;
-}
-
-thead th {
-    background-color: var(--text-color);
-    color: var(--white);
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 10px; 
-    letter-spacing: 0.5px;
-}
-
-tfoot td {
-    font-weight: 700;
-    background-color: #e2e8f0;
-    font-size: 12px;
-    border-top: 2px solid #cbd5e1;
-    color: var(--text-color);
-}
-
-.btn-aksi {
-    padding: 8px 16px;
-    margin: 5px;
-    cursor: pointer;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    transition: transform 0.1s, box-shadow 0.2s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.btn-aksi:active {
-    transform: translateY(1px);
-}
-
-.btn-tambah { background-color: #10b981; }
-.btn-simpan { background-color: #8b5cf6; box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2); }
-.btn-excel { background-color: #0ea5e9; }
-.btn-pdf { background-color: #ef4444; }
-.btn-upload { background-color: #6b7280; }
-.btn-import { background-color: #f59e0b; }
-.btn-reset { background-color: #ec4899; }
-.btn-hapus { background-color: #fef2f2; color: #ef4444; padding: 4px 8px; font-size: 10px; font-weight: 800; border: 1px solid #fecaca; box-shadow: none; border-radius: 4px; }
-
-.input-file-hidden { display: none; }
-
-.keterangan-bawah {
-    margin-top: 15px;
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-.keterangan-bawah p {
-    margin: 0 0 5px 0;
-}
-
-.tanda-tangan-area {
-    margin-top: 30px; 
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    text-align: center;
-}
-
-.tanda-tangan-item {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.tt-title {
-    font-weight: 700;
-    font-size: 13px;
-}
-
-.tt-space {
-    height: 100px; 
-    display: block;
-}
-
-.tt-name {
-    font-weight: 600;
-    font-size: 13px;
-    border-top: 1px solid #000; 
-    padding-top: 5px;
-    margin-top: auto;
-}
-
-/* ========================================= */
-/* CSS KHUSUS MODE PDF (PORTRAIT)            */
-/* ========================================= */
-
-.pdf-mode body {
-    background-color: white;
-}
-
-.pdf-mode .container-utama {
-    box-shadow: none;
-    border-radius: 0;
-    padding: 0;
-    margin: 0;
-    max-width: 100%;
-}
-
-.pdf-mode #area-cetak { 
-    padding: 20px 40px; 
-} 
-
-.pdf-mode .form { display: none !important; }
-.pdf-mode .th-aksi, .pdf-mode .td-aksi { display: none !important; }
-.pdf-mode .tombol-bawah { display: none !important; }
-
-.pdf-mode table {
-    border: 1px solid #000;
-    font-size: 9px !important; 
-}
-
-.pdf-mode th, .pdf-mode td {
-    border: 1px solid #000;
-    color: #000000 !important; 
-    background-color: transparent !important;
-    padding: 4px 2px !important; 
-}
-
-.pdf-mode td.nama-cell, .pdf-mode td.ket-cell {
-    white-space: nowrap !important;
-}
-
-.pdf-mode .editable:hover, .pdf-mode .editable:focus {
-    background-color: transparent;
-    color: inherit;
-    outline: none;
-}
-
-.pdf-mode thead th {
-    background-color: #f0f0f0 !important;
-    color: #000000 !important;
-}
-
-.pdf-mode tfoot td {
-    background-color: #f9f9f9 !important;
-    border: 1px solid #000;
-    color: #000000 !important;
-}
-
-.pdf-mode .input-box {
-    border: none !important;
-    border-bottom: 1px solid #000 !important;
-    font-size: 12px !important;
-    background: transparent !important;
-    font-weight: 600;
-    color: #000000 !important;
-    border-radius: 0;
-    padding: 5px 0;
-}
-
-.pdf-mode .info-container {
-    border: none;
-    background: transparent;
-    padding: 0;
-    margin-bottom: 5px;
-}
-
-.pdf-mode .kepada-section {
-    border: none;
-    background: transparent;
-    padding: 0;
-    margin-bottom: 5px !important;
-}
-
-.pdf-mode .kop-surat {
-    border-bottom: 3px double #000;
-    padding-bottom: 5px !important; 
-}
-
-.pdf-mode .kop-teks h1 { color: #000000 !important; }
-.pdf-mode .kop-teks p { color: #000000 !important; font-weight: 500 !important; }
-.pdf-mode .label-text { color: #000000 !important; font-weight: bold; }
-.pdf-mode h2 { font-size: 14px !important; color: #000000 !important; }
-
-.pdf-mode .keterangan-bawah {
-    margin-top: 10px;
-    font-size: 10px !important;
-}
-
-.pdf-mode .tanda-tangan-area {
-    margin-top: 20px;
-}
-
-.pdf-mode .tt-space {
-    height: 60px !important;
-}
-
-.pdf-mode .tt-name {
-    border-top: 1px solid #000;
-}
-
-</style>
+        .info-note {
+            background: #fef9e3;
+            border-radius: 16px;
+            padding: 12px;
+            margin: 12px 20px 20px;
+            font-size: 0.7rem;
+            color: #92400e;
+        }
+        @media (max-width: 880px) {
+            .two-columns { grid-template-columns: 1fr; }
+        }
+        button { cursor: pointer; }
+    </style>
 </head>
-
 <body>
-
-<div class="container-utama" id="area-cetak">
-    
-    <!-- KOP SURAT -->
-    <div class="kop-surat">
-        <div class="kop-teks">
-            <h1>PT. SARANA KENCANA MULYA</h1>
-            <p>JL. FRANS SEDA NO. 08 KOMPLEK RUKO ( RUKOKU )</p>
-            <p>KEL. FATULULI – KEC. OEBOBO – KOTA KUPANG</p>
-            <p>TELP. 0380 – 8445208 / +62 813-2816-2259</p>
-        </div>
-        <img id="logo-preview" src="https://placehold.co/80x80/png?text=LOGO" alt="Logo Perusahaan" class="kop-logo">
+<div class="dashboard">
+    <div class="header">
+        <h1>🏪 KiosKu Pro <span class="badge-pro">Excel + Laba</span></h1>
+        <div class="date-time" id="liveDateTime"></div>
     </div>
 
-    <h2>Surat Jalan</h2>
-
-    <!-- INFO UTAMA -->
-    <div class="info-container">
-        <div class="info-item">
-            <div class="label-text">Tanggal</div>
-            <!-- Ubah jadi text biasa agar bisa menampilkan nama hari -->
-            <input type="text" id="tanggal" class="input-box" readonly>
-            <!-- Hidden input untuk menyimpan nilai murni YYYY-MM-DD -->
-            <input type="date" id="tanggal-value" style="display:none;">
-        </div>
-        
-        <div class="info-item">
-            <div class="label-text">No. Surat Jalan</div>
-            <input type="text" id="noSurat" class="input-box" placeholder="Nomor Surat">
-        </div>
-        
-        <div class="info-item">
-            <div class="label-text">Tujuan</div>
-            <input type="text" id="tujuan" class="input-box" placeholder="Nama Penerima/Toko">
-        </div>
+    <!-- Kartu Metrik Keuangan -->
+    <div class="summary-cards">
+        <div class="card card-1"><div class="card-title">💰 TOTAL NILAI STOK (HARGA MODAL)</div><div class="card-value" id="totalStockValueModal">Rp 0</div><div class="card-sub">Berdasarkan harga beli (modal)</div></div>
+        <div class="card card-2"><div class="card-title">📈 OMSET (Penjualan Kotor)</div><div class="card-value" id="totalOmset">Rp 0</div><div class="card-sub">Akumulasi dari semua transaksi</div></div>
+        <div class="card card-3"><div class="card-title">🏆 LABA BERSIH</div><div class="card-value" id="totalLaba">Rp 0</div><div class="card-sub">Omset - HPP (Modal barang terjual)</div></div>
+        <div class="card card-4"><div class="card-title">🧾 TOTAL TRANSAKSI</div><div class="card-value" id="totalTransaksi">0</div><div class="card-sub">Jumlah kali checkout sukses</div></div>
+        <div class="card card-5"><div class="card-title">📦 ITEM TERJUAL</div><div class="card-value" id="totalItemTerjual">0</div><div class="card-sub">Keseluruhan unit laku</div></div>
     </div>
 
-    <!-- KEPADA YTH -->
-    <div class="kepada-section">
-        <div class="label-text">Kepada Yth.</div>
-        <input type="text" id="kepadaYth" class="input-box" placeholder="Nama Person/Atasan/Direktur">
-    </div>
-
-    <!-- FORM INPUT -->
-    <div class="form">
-        <input type="text" id="nama" class="nama" placeholder="Nama Sparepart">
-        <input type="number" id="qty" placeholder="Qty">
-        <input type="number" id="p" placeholder="P">
-        <input type="number" id="l" placeholder="L">
-        <input type="number" id="t" placeholder="T">
-        <input type="number" id="colly" placeholder="Colly">
-        <input type="text" id="ket" placeholder="Keterangan">
-        <button class="btn-aksi btn-tambah" onclick="tambah()">Tambah</button>
-    </div>
-
-    <br>
-
-    <table id="tabel">
-        <thead>
-            <tr>
-                <th rowspan="2" style="width: 40px;">No</th>
-                <th rowspan="2">Nama Sparepart</th>
-                <th rowspan="2" style="width: 50px;">Qty</th>
-                <th colspan="3" style="width: 150px;">Ukuran</th>
-                <th rowspan="2" style="width: 70px;">M<sup>3</sup></th>
-                <th rowspan="2" style="width: 60px;">Colly</th>
-                <th rowspan="2">Keterangan</th>
-                <th rowspan="2" class="th-aksi" style="width: 50px;">Aksi</th>
-            </tr>
-            <tr>
-                <th>P</th>
-                <th>L</th>
-                <th>T</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-        <tfoot>
-            <tr>
-                <td colspan="2" style="text-align:right; padding-right: 10px;"><b>TOTAL</b></td>
-                <td id="totalQty"><b>0</b></td>
-                <td colspan="3"></td>
-                <td id="totalm3"><b>0</b></td>
-                <td id="totalcolly"><b>0</b></td>
-                <td colspan="1"></td>
-                <td class="td-aksi"></td> 
-            </tr>
-        </tfoot>
-    </table>
-
-    <!-- KETERANGAN BAWAH TABEL -->
-    <div class="keterangan-bawah">
-        <p><strong>Data Rincian Sparepart Bekas Terlampir !</strong></p>
-        <p>Demikian Surat Jalan ini kami buat, atas perhatian dan kerja samanya kami ucapkan terima kasih.</p>
-    </div>
-
-    <!-- BAGIAN TANDA TANGAN -->
-    <div class="tanda-tangan-area">
-        <div class="tanda-tangan-item">
-            <div class="tt-title">Pengirim</div>
-            <div class="tt-space"></div>
-            <div class="tt-name">&nbsp;</div>
+    <div class="two-columns">
+        <!-- Sisi KIRI: KASIR + KERANJANG -->
+        <div class="kasir-panel">
+            <div class="panel-title">🧾 TRANSAKSI KASIR</div>
+            <div class="cart-area">
+                <div class="select-item">
+                    <div class="form-row">
+                        <select id="productSelect"><option value="">-- Pilih Barang --</option></select>
+                        <input type="number" id="qtyInput" placeholder="Jumlah" value="1" min="1">
+                        <button class="btn-add" id="addToCartBtn">➕ Tambah ke Keranjang</button>
+                    </div>
+                </div>
+                <div class="cart-table-container">
+                    <table class="cart-table">
+                        <thead><tr><th>Barang</th><th>Harga Jual</th><th>Jumlah</th><th>Subtotal</th><th>Aksi</th></tr></thead>
+                        <tbody id="cartBody"><tr><td colspan="5" style="text-align:center">Keranjang kosong</td></tr></tbody>
+                    </table>
+                </div>
+                <div class="total-section">
+                    <div>Total Belanja : <span class="total-line" id="cartTotal">Rp 0</span></div>
+                    <button class="btn-pay" id="checkoutBtn">💵 BAYAR & KURANGI STOK</button>
+                </div>
+            </div>
         </div>
-        <div class="tanda-tangan-item">
-            <div class="tt-title">Mengetahui</div>
-            <div class="tt-space"></div>
-            <div class="tt-name">&nbsp;</div>
-        </div>
-        <div class="tanda-tangan-item">
-            <div class="tt-title">Expedisi</div>
-            <div class="tt-space"></div>
-            <div class="tt-name">&nbsp;</div>
-        </div>
-        <div class="tanda-tangan-item">
-            <div class="tt-title">Penerima</div>
-            <div class="tt-space"></div>
-            <div class="tt-name">&nbsp;</div>
+
+        <!-- Sisi KANAN: MANAJEMEN STOK + UPLOAD/DOWNLOAD EXCEL -->
+        <div class="stok-panel">
+            <div class="panel-title">📦 DAFTAR BARANG (Modal + Jual) & Excel</div>
+            <div class="stok-header">
+                <div class="add-stock-form">
+                    <input type="text" id="newItemName" placeholder="Nama barang">
+                    <input type="number" id="newItemModal" placeholder="Harga Modal" value="0" min="0">
+                    <input type="number" id="newItemPrice" placeholder="Harga Jual" value="0" min="0">
+                    <input type="number" id="newItemStock" placeholder="Stok awal" value="1" min="0">
+                    <button class="btn-small" id="addNewProductBtn">➕ Tambah</button>
+                </div>
+                <div class="excel-actions">
+                    <button id="exportExcelBtn">📎 Download Excel (Stok)</button>
+                    <label for="uploadExcel">📂 Upload Excel & Ganti Stok</label>
+                    <input type="file" id="uploadExcel" accept=".xlsx, .xls, .csv">
+                </div>
+            </div>
+            <div class="stock-table-wrapper">
+                <table class="stock-table">
+                    <thead><tr><th>Nama</th><th>Modal</th><th>Harga Jual</th><th>Stok</th><th>Aksi</th></tr></thead>
+                    <tbody id="stockBody"></tbody>
+                </table>
+            </div>
+            <div class="info-note">
+                💡 Fitur Excel: Download template stok (nama, modal, harga jual, stok). Upload file akan mengganti seluruh data stok. Statistik transaksi dan riwayat tidak hilang.
+            </div>
         </div>
     </div>
-
-</div>
-
-<br>
-
-<div class="tombol-bawah" style="text-align: center; margin-top: 20px;">
-    <input type="file" id="file-upload" class="input-file-hidden" accept="image/*" onchange="previewLogo(event)">
-    <input type="file" id="file-excel" class="input-file-hidden" accept=".xlsx, .xls" onchange="importExcel(event)">
-    
-    <button class="btn-aksi btn-upload" onclick="document.getElementById('file-upload').click()">Upload Logo</button>
-    <button class="btn-aksi btn-simpan" onclick="simpanData()">Simpan Data</button>
-    <button class="btn-aksi btn-import" onclick="document.getElementById('file-excel').click()">Import Excel</button>
-    <button class="btn-aksi btn-excel" onclick="downloadExcel()">Download Excel</button>
-    <button class="btn-aksi btn-pdf" onclick="downloadPDF()">Download PDF</button>
-    <button class="btn-aksi btn-reset" onclick="resetForm()">Reset</button>
 </div>
 
 <script>
-    let no = 1;
+    // ---------- DATA PRODUK (HARGA MODAL & JUAL) ----------
+    let products = [
+        { id: "p1", name: "Indomie Goreng", modal: 2800, price: 3500, stock: 12 },
+        { id: "p2", name: "Aqua 600ml", modal: 2400, price: 3000, stock: 20 },
+        { id: "p3", name: "Roti Tawar", modal: 9000, price: 12000, stock: 5 },
+        { id: "p4", name: "Kopi Kapal Api", modal: 1800, price: 2500, stock: 30 },
+        { id: "p5", name: "Sabun Mandi", modal: 4200, price: 5500, stock: 8 }
+    ];
 
-    // ==========================================
-    // FUNGSI FORMAT TANGGAL
-    // ==========================================
-    
-    const hariIndo = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-    const bulanIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    // Statistik laporan (omset, laba, transaksi, item terjual)
+    let stats = {
+        omsetTotal: 0,
+        labaBersih: 0,
+        totalTransaksi: 0,
+        totalItemTerjual: 0
+    };
 
-    function formatTanggalIndo(dateStr) {
-        if (!dateStr) return "";
-        const date = new Date(dateStr);
-        if (isNaN(date.getTime())) return "";
-        
-        const namaHari = hariIndo[date.getDay()];
-        const tanggal = date.getDate();
-        const namaBulan = bulanIndo[date.getMonth()];
-        const tahun = date.getFullYear();
+    let cart = []; // { productId, name, modal, price, quantity }
 
-        return `${namaHari}, ${tanggal} ${namaBulan} ${tahun}`;
+    // Helper
+    function generateId() { return 'prod_' + Date.now() + '_' + Math.floor(Math.random() * 10000); }
+
+    // Render All UI
+    function renderAll() {
+        renderProductSelect();
+        renderStockTable();
+        renderCartTable();
+        updateCartTotal();
+        updateFinancialStats();
     }
 
-    // ==========================================
-    // LOGICA LOCAL STORAGE (SIMPAN & MUAT DATA)
-    // ==========================================
-
-    function simpanData() {
-        const data = {
-            tanggal: document.getElementById('tanggal-value').value, // Simpan format date murni
-            noSurat: document.getElementById('noSurat').value,
-            tujuan: document.getElementById('tujuan').value,
-            kepadaYth: document.getElementById('kepadaYth').value,
-            logo: document.getElementById('logo-preview').src,
-            items: []
-        };
-
-        const rows = document.querySelectorAll("#tabel tbody tr");
-        rows.forEach(row => {
-            const cells = row.cells;
-            if(cells[1].innerText.trim() !== "") {
-                data.items.push({
-                    nama: cells[1].innerText,
-                    qty: cells[2].innerText,
-                    p: cells[3].innerText,
-                    l: cells[4].innerText,
-                    t: cells[5].innerText,
-                    colly: cells[7].innerText,
-                    ket: cells[8].innerText
-                });
+    // Dropdown pilih barang
+    function renderProductSelect() {
+        const select = document.getElementById('productSelect');
+        select.innerHTML = '<option value="">-- Pilih Barang --</option>';
+        products.forEach(prod => {
+            const option = document.createElement('option');
+            option.value = prod.id;
+            option.textContent = `${prod.name} | Jual: Rp${prod.price.toLocaleString()} | Stok:${prod.stock}`;
+            if (prod.stock <= 0) {
+                option.disabled = true;
+                option.textContent += ' (Habis)';
             }
+            select.appendChild(option);
         });
-
-        localStorage.setItem('suratJalanData', JSON.stringify(data));
-        alert("Data berhasil disimpan ke browser!");
     }
 
-    function muatData() {
-        const storedData = localStorage.getItem('suratJalanData');
-        if (storedData) {
-            const data = JSON.parse(storedData);
+    // Tabel stok (menampilkan modal, harga jual, stok)
+    function renderStockTable() {
+        const tbody = document.getElementById('stockBody');
+        if (!tbody) return;
+        if (products.length === 0) { tbody.innerHTML = '<tr><td colspan="5">Tidak ada barang</td></tr>'; return; }
+        tbody.innerHTML = '';
+        products.forEach(prod => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerText = prod.name;
+            row.insertCell(1).innerHTML = `Rp ${prod.modal.toLocaleString()}`;
+            row.insertCell(2).innerHTML = `Rp ${prod.price.toLocaleString()}`;
+            const stockCell = row.insertCell(3);
+            const stockSpan = document.createElement('span');
+            stockSpan.className = `stock-badge ${prod.stock <= 2 ? 'low-stock' : ''}`;
+            stockSpan.innerText = prod.stock;
+            stockCell.appendChild(stockSpan);
+            const actionCell = row.insertCell(4);
+            const btnInc = document.createElement('button'); btnInc.innerText = '+ Stok'; btnInc.className = 'btn-stock-act';
+            btnInc.onclick = () => adjustStock(prod.id, 1);
+            const btnDec = document.createElement('button'); btnDec.innerText = '- Stok'; btnDec.className = 'btn-stock-act';
+            btnDec.onclick = () => adjustStock(prod.id, -1);
+            const btnDel = document.createElement('button'); btnDel.innerText = 'Hapus'; btnDel.className = 'btn-stock-act btn-delete';
+            btnDel.onclick = () => deleteProduct(prod.id);
+            actionCell.appendChild(btnInc); actionCell.appendChild(btnDec); actionCell.appendChild(btnDel);
+        });
+    }
 
-            const tanggalVal = data.tanggal || new Date().toISOString().split('T')[0];
-            document.getElementById('tanggal-value').value = tanggalVal;
-            document.getElementById('tanggal').value = formatTanggalIndo(tanggalVal);
-            
-            document.getElementById('noSurat').value = data.noSurat || "";
-            document.getElementById('tujuan').value = data.tujuan || "";
-            document.getElementById('kepadaYth').value = data.kepadaYth || "";
-            
-            if(data.logo) {
-                document.getElementById('logo-preview').src = data.logo;
-            }
+    function adjustStock(productId, delta) {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+        let newStock = product.stock + delta;
+        if (newStock < 0) { alert('Stok tidak boleh negatif'); return; }
+        product.stock = newStock;
+        validateCartAgainstStock();
+        renderAll();
+    }
 
-            if(data.items && data.items.length > 0) {
-                data.items.forEach(item => {
-                    tambahManual(item.nama, item.qty, item.p, item.l, item.t, item.colly, item.ket);
-                });
+    function deleteProduct(productId) {
+        if (confirm('Hapus barang? Data penjualan sebelumnya tetap tersimpan di statistik.')) {
+            products = products.filter(p => p.id !== productId);
+            cart = cart.filter(item => item.productId !== productId);
+            renderAll();
+        }
+    }
+
+    function addNewProduct() {
+        const name = document.getElementById('newItemName').value.trim();
+        const modal = parseInt(document.getElementById('newItemModal').value);
+        const price = parseInt(document.getElementById('newItemPrice').value);
+        const stock = parseInt(document.getElementById('newItemStock').value);
+        if (!name) { alert('Nama barang harus diisi'); return; }
+        if (isNaN(modal) || modal < 0) { alert('Harga modal harus angka >=0'); return; }
+        if (isNaN(price) || price < 0) { alert('Harga jual harus angka >=0'); return; }
+        if (isNaN(stock) || stock < 0) { alert('Stok harus angka >=0'); return; }
+        if (modal > price) alert('⚠️ Harga modal lebih besar dari harga jual, potensi rugi!');
+        const newId = generateId();
+        products.push({ id: newId, name, modal, price, stock });
+        document.getElementById('newItemName').value = '';
+        document.getElementById('newItemModal').value = '0';
+        document.getElementById('newItemPrice').value = '0';
+        document.getElementById('newItemStock').value = '1';
+        renderAll();
+    }
+
+    function validateCartAgainstStock() {
+        let changed = false;
+        for (let i=0; i<cart.length; i++) {
+            const item = cart[i];
+            const prod = products.find(p => p.id === item.productId);
+            if (!prod) { cart.splice(i,1); changed=true; i--; continue; }
+            if (item.quantity > prod.stock) {
+                if (prod.stock === 0) { cart.splice(i,1); changed=true; i--; alert(`${item.name} stok habis, dihapus dari keranjang.`); }
+                else { item.quantity = prod.stock; alert(`${item.name} stok tersisa ${prod.stock}, jumlah disesuaikan.`); changed=true; }
             }
+        }
+        if (changed) { renderCartTable(); updateCartTotal(); }
+    }
+
+    function addToCart() {
+        const select = document.getElementById('productSelect');
+        const productId = select.value;
+        if (!productId) { alert('Pilih barang'); return; }
+        let qty = parseInt(document.getElementById('qtyInput').value);
+        if (isNaN(qty) || qty < 1) qty = 1;
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+        if (product.stock <= 0) { alert(`Stok ${product.name} habis`); return; }
+        if (qty > product.stock) { alert(`Stok tidak cukup. Tersedia: ${product.stock}`); return; }
+        const existing = cart.findIndex(i => i.productId === productId);
+        if (existing !== -1) {
+            const newQty = cart[existing].quantity + qty;
+            if (newQty > product.stock) { alert(`Total melebihi stok (stok: ${product.stock})`); return; }
+            cart[existing].quantity = newQty;
         } else {
-            // Jika tidak ada data, set tanggal hari ini
-            setTanggalHariIni();
+            cart.push({ productId: product.id, name: product.name, modal: product.modal, price: product.price, quantity: qty });
         }
+        document.getElementById('qtyInput').value = '1';
+        renderCartTable();
+        updateCartTotal();
     }
 
-    function setTanggalHariIni() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('tanggal-value').value = today;
-        document.getElementById('tanggal').value = formatTanggalIndo(today);
+    function renderCartTable() {
+        const tbody = document.getElementById('cartBody');
+        if (!tbody) return;
+        if (cart.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Keranjang kosong</td></tr>'; return; }
+        tbody.innerHTML = '';
+        cart.forEach((item, idx) => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerText = item.name;
+            row.insertCell(1).innerText = `Rp ${item.price.toLocaleString()}`;
+            const qtyCell = row.insertCell(2);
+            const divCtrl = document.createElement('div'); divCtrl.className = 'qty-control';
+            const minus = document.createElement('button'); minus.innerText = '-'; minus.onclick = () => changeQty(idx, -1);
+            const qtySpan = document.createElement('span'); qtySpan.innerText = item.quantity; qtySpan.style.fontWeight='bold';
+            const plus = document.createElement('button'); plus.innerText = '+'; plus.onclick = () => changeQty(idx, 1);
+            divCtrl.append(minus, qtySpan, plus); qtyCell.appendChild(divCtrl);
+            const subtotal = item.price * item.quantity;
+            row.insertCell(3).innerText = `Rp ${subtotal.toLocaleString()}`;
+            const actCell = row.insertCell(4);
+            const delBtn = document.createElement('button'); delBtn.innerText = 'Hapus'; delBtn.className = 'remove-item';
+            delBtn.onclick = () => { cart.splice(idx,1); renderAll(); };
+            actCell.appendChild(delBtn);
+        });
     }
 
-    // ==========================================
-    // LOGICA DASAR APLIKASI
-    // ==========================================
-
-    document.addEventListener("DOMContentLoaded", function() {
-        muatData();
-    });
-
-    function resetForm() {
-        if(confirm("Apakah Anda yakin ingin mereset semua data? Data yang tersimpan juga akan terhapus.")) {
-            localStorage.removeItem('suratJalanData');
-            document.querySelector("#tabel tbody").innerHTML = "";
-            setTanggalHariIni();
-            document.getElementById('noSurat').value = "";
-            document.getElementById('tujuan').value = "";
-            document.getElementById('kepadaYth').value = "";
-            document.getElementById('logo-preview').src = "https://placehold.co/80x80/png?text=LOGO";
-            no = 1;
-            updateTotal();
-        }
+    function changeQty(index, delta) {
+        const item = cart[index];
+        const prod = products.find(p => p.id === item.productId);
+        if (!prod) { cart.splice(index,1); renderAll(); return; }
+        let newQty = item.quantity + delta;
+        if (newQty < 1) { cart.splice(index,1); renderAll(); return; }
+        if (newQty > prod.stock) { alert(`Stok ${prod.name} hanya ${prod.stock}`); return; }
+        item.quantity = newQty;
+        renderCartTable();
+        updateCartTotal();
     }
 
-    function previewLogo(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('logo-preview').src = e.target.result;
+    function updateCartTotal() {
+        let total = cart.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+        document.getElementById('cartTotal').innerText = `Rp ${total.toLocaleString()}`;
+    }
+
+    function checkout() {
+        if (cart.length === 0) { alert('Keranjang kosong'); return; }
+        for (let item of cart) {
+            const prod = products.find(p => p.id === item.productId);
+            if (!prod || prod.stock < item.quantity) {
+                alert(`Stok untuk ${item.name} tidak mencukupi. Periksa kembali.`);
+                validateCartAgainstStock();
+                renderAll();
+                return;
             }
-            reader.readAsDataURL(file);
         }
+        let transaksiOmset = 0, transaksiHPP = 0, totalUnitTerjual = 0;
+        for (let item of cart) {
+            const prod = products.find(p => p.id === item.productId);
+            if (!prod) continue;
+            transaksiOmset += item.price * item.quantity;
+            transaksiHPP += prod.modal * item.quantity;
+            totalUnitTerjual += item.quantity;
+            prod.stock -= item.quantity;
+        }
+        const labaTransaksi = transaksiOmset - transaksiHPP;
+        stats.omsetTotal += transaksiOmset;
+        stats.labaBersih += labaTransaksi;
+        stats.totalTransaksi += 1;
+        stats.totalItemTerjual += totalUnitTerjual;
+        cart = [];
+        alert(`✅ Transaksi sukses!\n💵 Omset: Rp ${transaksiOmset.toLocaleString()}\n📉 HPP: Rp ${transaksiHPP.toLocaleString()}\n🏆 Laba: Rp ${labaTransaksi.toLocaleString()}`);
+        renderAll();
     }
 
-    function importExcel(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    function updateFinancialStats() {
+        const totalStockModal = products.reduce((sum, p) => sum + (p.modal * p.stock), 0);
+        document.getElementById('totalStockValueModal').innerHTML = `Rp ${totalStockModal.toLocaleString()}`;
+        document.getElementById('totalOmset').innerHTML = `Rp ${stats.omsetTotal.toLocaleString()}`;
+        document.getElementById('totalLaba').innerHTML = `Rp ${stats.labaBersih.toLocaleString()}`;
+        document.getElementById('totalTransaksi').innerText = stats.totalTransaksi;
+        document.getElementById('totalItemTerjual').innerText = stats.totalItemTerjual;
+    }
 
+    // ========== FUNGSI EXCEL ==========
+    function exportToExcel() {
+        // Konversi data products ke format worksheet: Nama, Modal, Harga Jual, Stok
+        const worksheetData = [["Nama Barang", "Harga Modal", "Harga Jual", "Stok"]];
+        products.forEach(prod => {
+            worksheetData.push([prod.name, prod.modal, prod.price, prod.stock]);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "DataStok");
+        XLSX.writeFile(wb, `Stok_Kios_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+    }
+
+    function importExcel(file) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
-            
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            
-            jsonData.forEach((row, index) => {
-                if (index === 0) return; 
-
-                let nama = row[0] || "";
-                let qty = parseFloat(row[1]) || 0;
-                let p = parseFloat(row[2]) || 0;
-                let l = parseFloat(row[3]) || 0;
-                let t = parseFloat(row[4]) || 0;
-                let colly = parseFloat(row[5]) || 0;
-                let ket = row[6] || "";
-
-                if (!nama && !qty && !p) return;
-                tambahManual(nama, qty, p, l, t, colly, ket);
-            });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+            if (!rows || rows.length < 2) { alert("File kosong atau tidak valid"); return; }
+            // Baris pertama header: "Nama Barang", "Harga Modal", "Harga Jual", "Stok" (case-insensitive, urutan bebas? kita pakai indeks 0,1,2,3)
+            // Asumsikan kolom: 0=Nama, 1=Modal, 2=HargaJual, 3=Stok
+            const newProducts = [];
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row || row.length < 4) continue;
+                const name = row[0] ? String(row[0]).trim() : "";
+                const modal = parseFloat(row[1]);
+                const price = parseFloat(row[2]);
+                const stock = parseInt(row[3]);
+                if (name === "") continue;
+                if (isNaN(modal) || isNaN(price) || isNaN(stock)) {
+                    alert(`Baris ke-${i+1} tidak valid, pastikan kolom angka. Lewati.`);
+                    continue;
+                }
+                newProducts.push({
+                    id: generateId(),
+                    name: name,
+                    modal: modal,
+                    price: price,
+                    stock: Math.max(0, stock)
+                });
+            }
+            if (newProducts.length === 0) { alert("Tidak ada data valid yang diimpor."); return; }
+            // Konfirmasi penggantian total stok (statistik transaksi tetap)
+            if (confirm(`Import ${newProducts.length} barang? Data stok saat ini akan diganti total. (Transaksi & laporan tidak hilang)`)) {
+                products = newProducts;
+                // Bersihkan keranjang karena ID produk berubah total
+                cart = [];
+                renderAll();
+                alert("Import berhasil! Seluruh stok telah diganti.");
+            }
         };
+        reader.onerror = () => alert("Gagal membaca file");
         reader.readAsArrayBuffer(file);
     }
 
-    function handleEdit(e) {
-        if (e.target.classList.contains('editable')) {
-            updateTotal(); 
-        }
-    }
-
-    document.querySelector("#tabel tbody").addEventListener('input', handleEdit);
-
-    function tambahManual(nama, qty, p, l, t, colly, ket) {
-        let m3Value = (p * l * t) / 1000000;
-        let tabel = document.querySelector("#tabel tbody");
-        let row = tabel.insertRow();
-
-        row.innerHTML =
-        `<td>${no++}</td>
-        <td class="nama-cell"><span class="editable" contenteditable="true">${nama}</span></td>
-        <td><span class="editable" contenteditable="true">${qty}</span></td>
-        <td><span class="editable" contenteditable="true">${p}</span></td>
-        <td><span class="editable" contenteditable="true">${l}</span></td>
-        <td><span class="editable" contenteditable="true">${t}</span></td>
-        <td class="m3">${m3Value.toFixed(3)}</td>
-        <td><span class="editable" contenteditable="true">${colly}</span></td>
-        <td class="ket-cell"><span class="editable" contenteditable="true">${ket}</span></td>
-        <td class="td-aksi"><button class="btn-aksi btn-hapus" onclick="hapus(this)">X</button></td>`;
-
-        row.querySelectorAll('.editable').forEach(el => {
-            el.addEventListener('blur', function() {
-                const parentRow = this.closest('tr');
-                if(parentRow) {
-                    const cells = parentRow.cells;
-                    let pVal = parseFloat(cells[3].innerText) || 0;
-                    let lVal = parseFloat(cells[4].innerText) || 0;
-                    let tVal = parseFloat(cells[5].innerText) || 0;
-                    let m3 = (pVal * lVal * tVal) / 1000000;
-                    cells[6].innerText = m3.toFixed(3);
-                    updateTotal();
-                }
-            });
-        });
-
-        updateTotal();
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const inputs = document.querySelectorAll('.form input');
-        inputs.forEach(input => {
-            input.addEventListener("keypress", function(event) {
-                if (event.key === "Enter") {
-                    event.preventDefault();
-                    tambah();
-                }
-            });
+    // Event & init
+    document.addEventListener('DOMContentLoaded', () => {
+        renderAll();
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('liveDateTime').innerText = now.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        }, 1000);
+        document.getElementById('addToCartBtn').addEventListener('click', addToCart);
+        document.getElementById('checkoutBtn').addEventListener('click', checkout);
+        document.getElementById('addNewProductBtn').addEventListener('click', addNewProduct);
+        document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+        const fileInput = document.getElementById('uploadExcel');
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files.length > 0) importExcel(fileInput.files[0]);
+            fileInput.value = '';
         });
     });
-
-    function tambah(){
-        let nama = document.getElementById("nama").value;
-        let qty = parseFloat(document.getElementById("qty").value) || 0;
-        let p = parseFloat(document.getElementById("p").value) || 0;
-        let l = parseFloat(document.getElementById("l").value) || 0;
-        let t = parseFloat(document.getElementById("t").value) || 0;
-        let colly = parseFloat(document.getElementById("colly").value) || 0;
-        let ket = document.getElementById("ket").value;
-
-        if(!nama) { alert("Nama Sparepart harus diisi!"); return; }
-
-        tambahManual(nama, qty, p, l, t, colly, ket);
-        
-        const ids = ['nama', 'qty', 'p', 'l', 't', 'colly', 'ket'];
-        ids.forEach(id => document.getElementById(id).value = '');
-        document.getElementById("nama").focus();
-    }
-
-    function hapus(btn){
-        btn.parentElement.parentElement.remove();
-        let rows = document.querySelectorAll("#tabel tbody tr");
-        no = 1;
-        rows.forEach(row => { row.cells[0].innerText = no++; });
-        updateTotal();
-    }
-
-    function updateTotal(){
-        let totalm3 = 0; 
-        let totalcolly = 0;
-        let totalQty = 0; 
-
-        document.querySelectorAll("#tabel tbody tr").forEach(row => {
-            totalm3 += parseFloat(row.cells[6].innerText) || 0;
-            totalcolly += parseFloat(row.cells[7].innerText) || 0;
-            totalQty += parseFloat(row.cells[2].innerText) || 0;
-        });
-        
-        document.getElementById("totalm3").innerText = totalm3.toFixed(3);
-        document.getElementById("totalcolly").innerText = totalcolly;
-        document.getElementById("totalQty").innerText = totalQty; 
-    }
-
-    function downloadExcel() {
-        let cloneTable = document.getElementById("tabel").cloneNode(true);
-        let rows = cloneTable.querySelectorAll("tr");
-        rows.forEach(row => { if (row.lastElementChild) row.deleteCell(-1); });
-
-        let wb = XLSX.utils.book_new();
-        
-        // Gunakan nilai tanggal yang sudah terformat
-        let tanggal = document.getElementById('tanggal').value; 
-        let noSurat = document.getElementById("noSurat").value;
-        let tujuan = document.getElementById("tujuan").value;
-        let kepadaYth = document.getElementById("kepadaYth").value;
-
-        let headerData = [
-            ["PT. SARANA KENCANA MULYA"],
-            ["JL. FRANS SEDA NO. 08 KOMPLEK RUKO ( RUKOKU )"],
-            ["Surat Jalan"],
-            ["Tanggal", tanggal, "No Surat", noSurat],
-            ["Tujuan", tujuan],
-            ["Kepada Yth.", kepadaYth],
-            []
-        ];
-
-        let ws = XLSX.utils.table_to_sheet(cloneTable);
-        let wsData = XLSX.utils.sheet_to_json(ws, { header: 1 });
-        let finalData = headerData.concat(wsData);
-        
-        finalData.push([]);
-        finalData.push(["Data Rincian Sparepart Bekas Terlampir !"]);
-        finalData.push(["Demikian Surat Jalan ini kami buat, atas perhatian dan kerja samanya kami ucapkan terima kasih."]);
-        finalData.push([]);
-        
-        finalData.push(["Pengirim", "Mengetahui", "Expedisi", "Penerima"]);
-        finalData.push(["", "", "", ""]);
-
-        let newWs = XLSX.utils.aoa_to_sheet(finalData);
-        XLSX.utils.book_append_sheet(wb, newWs, "Surat Jalan");
-        XLSX.writeFile(wb, "Surat_Jalan.xlsx");
-    }
-
-    async function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const element = document.getElementById('area-cetak');
-        
-        document.body.classList.add('pdf-mode');
-
-        const canvas = await html2canvas(element, {
-            scale: 3, // Resolusi Tinggi (HD)
-            useCORS: true,
-            allowTaint: true, 
-            scrollX: 0,
-            scrollY: 0,
-            windowWidth: 794 
-        });
-
-        document.body.classList.remove('pdf-mode');
-        
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
-        
-        const pdf = new jsPDF({ orientation: 'p', unit: 'px', format: 'a4' });
-        
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        
-        const imgWidth = canvas.width;
-        const imgHeight = canvas.height;
-        
-        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-        
-        const width = imgWidth * ratio;
-        const height = imgHeight * ratio;
-        const x = (pdfWidth - width) / 2;
-        const y = 10; 
-        
-        pdf.addImage(imgData, 'JPEG', x, y, width, height);
-        pdf.save("Surat_Jalan.pdf");
-    }
 </script>
 </body>
 </html>
