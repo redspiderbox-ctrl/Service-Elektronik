@@ -74,6 +74,8 @@
         .btn-disabled:hover { background:rgba(100,116,139,0.15); }
         .btn-locked { background:rgba(239,68,68,0.08);color:var(--danger);padding:6px 14px;border-radius:7px;border:1px solid rgba(239,68,68,0.2);font-weight:500;font-size:12px;cursor:not-allowed;font-family:inherit;display:inline-flex;align-items:center;gap:5px; }
         .btn-locked i { font-size:11px; }
+        .btn-success { background:rgba(16,185,129,0.15);color:var(--accent);padding:6px 14px;border-radius:7px;border:1px solid rgba(16,185,129,0.3);font-weight:500;font-size:12px;cursor:pointer;transition:all 0.2s;font-family:inherit;display:inline-flex;align-items:center;gap:5px; }
+        .btn-success:hover { background:rgba(16,185,129,0.25);transform:translateY(-1px); }
         .form-input { width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;font-family:inherit;transition:border-color 0.2s,background 0.3s;outline:none; }
         .form-input:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(16,185,129,0.1); }
         .form-input::placeholder { color:var(--muted); }
@@ -82,6 +84,7 @@
         select.form-input { appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px; }
         .badge { padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;display:inline-block; }
         .badge-masuk { background:rgba(6,182,212,0.15);color:#06B6D4; } .badge-diperiksa { background:rgba(245,158,11,0.15);color:#F59E0B; } .badge-proses { background:rgba(139,92,246,0.15);color:#A78BFA; } .badge-selesai { background:rgba(16,185,129,0.15);color:#10B981; } .badge-diambil { background:rgba(100,116,139,0.15);color:#94A3B8; }
+        .badge-masuk-stok { background:rgba(16,185,129,0.15);color:#10B981; }
         table { width:100%;border-collapse:collapse; }
         thead th { background:var(--bg2);padding:12px 16px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);text-align:left;border-bottom:1px solid var(--border); }
         tbody td { padding:12px 16px;font-size:13px;border-bottom:1px solid rgba(31,45,71,0.3);vertical-align:middle; }
@@ -119,6 +122,41 @@
         [data-theme="light"] .theme-toggle .fa-moon { opacity:0.3; }
         [data-theme="light"] .theme-toggle .fa-sun { opacity:1; }
 
+        /* ===== STOK SUMMARY CARD ===== */
+        .stok-summary { 
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:20px 24px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            flex-wrap:wrap;
+            gap:16px;
+            margin-bottom:16px;
+        }
+        .stok-summary .total-item {
+            display:flex;
+            flex-direction:column;
+            gap:4px;
+        }
+        .stok-summary .total-item .label {
+            font-size:12px;
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+            color:var(--muted);
+            font-weight:600;
+        }
+        .stok-summary .total-item .value {
+            font-size:20px;
+            font-weight:700;
+            color:var(--accent2);
+        }
+        .stok-summary .total-item .value.total-nilai {
+            color:var(--accent);
+            font-size:22px;
+        }
+
         /* ===== RESPONSIVE TWEAKS ===== */
         @media (max-width:768px) {
             .sidebar { transform:translateX(-100%);width:280px; }
@@ -140,6 +178,8 @@
             .btn-primary, .btn-secondary, .btn-info { padding:8px 16px;font-size:13px; }
             .form-input { font-size:14px;padding:10px 12px; }
             .login-box { padding:24px 16px; }
+            .stok-summary { flex-direction:column;align-items:stretch;text-align:center; }
+            .stok-summary .total-item .value { font-size:18px; }
         }
         @media (max-width:480px) {
             .main-content .p-8 { padding:12px; }
@@ -148,6 +188,7 @@
             .stat-card .text-2xl { font-size:20px; }
             .toast-container { top:10px;right:10px;left:10px; }
             .toast { min-width:auto;width:100%; }
+            .stok-summary .total-item .value { font-size:16px; }
         }
     </style>
 </head>
@@ -184,6 +225,7 @@
                 <p class="px-8 py-2 mt-3 text-xs font-semibold uppercase tracking-wider" style="color:var(--muted);opacity:0.5">Pengaturan</p>
                 <div class="nav-item" data-page="jenis" onclick="navigate('jenis')"><i class="fas fa-tags"></i> Jenis &amp; Biaya Service</div>
                 <div class="nav-item" data-page="stok" onclick="navigate('stok')"><i class="fas fa-warehouse"></i> Stok Sparepart</div>
+                <div class="nav-item" data-page="riwayatstok" onclick="navigate('riwayatstok')"><i class="fas fa-clock-rotate-left"></i> Riwayat Stok Masuk</div>
                 <p class="px-8 py-2 mt-3 text-xs font-semibold uppercase tracking-wider" style="color:var(--muted);opacity:0.5">Laporan</p>
                 <div class="nav-item" data-page="riwayat" onclick="navigate('riwayat')"><i class="fas fa-clock-rotate-left"></i> Riwayat Service</div>
                 <div class="nav-item" data-page="laporan" onclick="navigate('laporan')"><i class="fas fa-file-invoice-dollar"></i> Laporan</div>
@@ -218,7 +260,97 @@
                 <section class="page-section" id="page-administrasi"><div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6"><div class="data-card"><div class="p-4 sm:p-5 border-b" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Cari Barang</h3></div><div class="p-4 sm:p-5 space-y-4"><div><label class="form-label">Nomor Service</label><input type="text" class="form-input" id="cariNoService" placeholder="SVC-XXXXXXXX"></div><button class="btn-primary w-full" onclick="cariPengambilan()"><i class="fas fa-search"></i> Cari</button></div><div class="px-4 pb-4 sm:px-5 sm:pb-5"><p class="text-xs mb-3 font-semibold" style="color:var(--muted)">Barang Siap Diambil</p><div id="listSiapAmbil" class="space-y-2"></div></div></div><div class="lg:col-span-2"><div class="data-card mb-4 sm:mb-5" id="detailPengambilan" style="display:none"><div class="p-4 sm:p-5 border-b" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Detail Service</h3></div><div class="p-4 sm:p-5" id="detailAmbilContent"></div></div><div class="data-card mb-4 sm:mb-5" id="formPengambilanCard" style="display:none"><div class="p-4 sm:p-5 border-b" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Form Administrasi</h3></div><form class="p-4 sm:p-5 space-y-4" id="formAmbil" onsubmit="return prosesAdministrasi(event)"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="form-label">Biaya Service (Rp)</label><input type="number" class="form-input" id="aBiaya" required min="0"></div><div><label class="form-label">Total Biaya Sparepart (Rp)</label><input type="number" class="form-input" id="aSparepart" value="0" min="0" readonly style="background:var(--card2);cursor:not-allowed"></div></div><div class="p-3 sm:p-4 rounded-xl" style="background:var(--bg2);border:1px solid var(--border)"><div class="flex items-center justify-between mb-3"><h4 class="text-sm font-semibold" style="color:var(--accent)"><i class="fas fa-puzzle-piece mr-2"></i>Sparepart Digunakan</h4><div class="flex gap-2"><button type="button" class="btn-secondary btn-sm" onclick="tambahBarisSparepart()"><i class="fas fa-plus"></i> Tambah</button><button type="button" class="btn-primary btn-sm" onclick="simpanSparepartKeDatabase()"><i class="fas fa-save"></i> Simpan</button></div></div><div class="overflow-x-auto"><table><thead><tr><th style="background:transparent;padding:8px 6px;font-size:11px">Sparepart</th><th style="background:transparent;padding:8px 6px;font-size:11px">Harga</th><th style="background:transparent;padding:8px 6px;font-size:11px;width:70px">Stok</th><th style="background:transparent;padding:8px 6px;font-size:11px;width:80px">Qty</th><th style="background:transparent;padding:8px 6px;font-size:11px">Subtotal</th><th style="background:transparent;padding:8px 6px;font-size:11px;width:40px"></th></tr></thead><tbody id="sparepartPickerBody"><tr id="sparepartEmptyRow"><td colspan="6" class="text-center py-3 text-xs" style="color:var(--muted)">Klik "Tambah" untuk memilih sparepart</td></tr></tbody></table></div></div><div><label class="form-label">Catatan Teknisi</label><textarea class="form-input" id="aCatatan" rows="2" placeholder="Hasil perbaikan..."></textarea></div><div class="flex flex-wrap gap-3"><button type="submit" class="btn-primary"><i class="fas fa-hand-holding"></i> Proses Administrasi Selesai</button><button type="button" class="btn-secondary" onclick="cetakStruk()"><i class="fas fa-print"></i> Cetak Struk</button><button type="button" class="btn-info" onclick="downloadStrukPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button></div></form></div><div id="strukContainer" style="display:none" class="data-card p-4 sm:p-5 print-receipt"></div></div></div></section>
                 <section class="page-section" id="page-selesai"><div class="data-card"><div class="p-4 sm:p-5 border-b flex flex-wrap items-center justify-between gap-3" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Barang Service Selesai (Siap Diambil)</h3><div class="flex items-center gap-3 flex-wrap"><input type="text" class="form-input" style="width:200px;max-width:100%" placeholder="Cari no service / pelanggan..." id="searchSelesai" oninput="renderSelesai()"></div></div><div class="overflow-x-auto"><table><thead><tr><th>No. Service</th><th>Tanggal</th><th>Pelanggan</th><th>Barang</th><th>Type</th><th>No. Seri</th><th>Kelengkapan</th><th>Keluhan</th><th>Total Biaya</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="selesaiTable"></tbody></table></div></div></section>
                 <section class="page-section" id="page-jenis"><div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6"><div class="data-card"><div class="p-4 sm:p-5 border-b" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Tambah Jenis Barang</h3></div><form class="p-4 sm:p-5 space-y-4" id="formJenis" onsubmit="return simpanJenis(event)"><div><label class="form-label">Nama Jenis Barang</label><input type="text" class="form-input" id="jNama" placeholder="Contoh: Televisi LED" required></div><div><label class="form-label">Biaya Service Dasar (Rp)</label><input type="number" class="form-input" id="jBiaya" placeholder="0" required min="0"></div><div><label class="form-label">Deskripsi</label><textarea class="form-input" id="jDeskripsi" rows="2" placeholder="Keterangan tambahan..."></textarea></div><button type="submit" class="btn-primary w-full"><i class="fas fa-plus"></i> Simpan Jenis</button></form></div><div class="lg:col-span-2 data-card"><div class="p-4 sm:p-5 border-b" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Daftar Jenis Barang & Biaya</h3></div><div class="overflow-x-auto"><table><thead><tr><th>Nama Jenis</th><th>Biaya Dasar</th><th>Deskripsi</th><th>Aksi</th></tr></thead><tbody id="jenisTable"></tbody></table></div></div></div></section>
-                <section class="page-section" id="page-stok"><div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6"><div class="data-card"><div class="p-4 sm:p-5 border-b" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Tambah Sparepart</h3></div><form class="p-4 sm:p-5 space-y-4" id="formStok" onsubmit="return simpanSparepart(event)"><div><label class="form-label">Nama Sparepart</label><input type="text" class="form-input" id="sNama" placeholder="Contoh: Kapasitor 450V" required></div><div class="grid grid-cols-2 gap-3"><div><label class="form-label">Jumlah</label><input type="number" class="form-input" id="sJumlah" placeholder="0" required min="0"></div><div><label class="form-label">Harga (Rp)</label><input type="number" class="form-input" id="sHarga" placeholder="0" required min="0"></div></div><div><label class="form-label">Kategori</label><input type="text" class="form-input" id="sKategori" placeholder="Contoh: Kapasitor, IC, Kabel"></div><button type="submit" class="btn-primary w-full"><i class="fas fa-plus"></i> Simpan Sparepart</button></form></div><div class="lg:col-span-2 data-card"><div class="p-4 sm:p-5 border-b flex flex-wrap items-center justify-between gap-3" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Daftar Stok Sparepart</h3><input type="text" class="form-input" style="width:180px;max-width:100%" placeholder="Cari sparepart..." id="searchStok" oninput="renderStok()"></div><div class="overflow-x-auto"><table><thead><tr><th>Nama</th><th>Kategori</th><th>Stok</th><th>Harga</th><th>Aksi</th></tr></thead><tbody id="stokTable"></tbody></table></div></div></div></section>
+                <section class="page-section" id="page-stok">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                        <div class="data-card">
+                            <div class="p-4 sm:p-5 border-b" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Tambah Sparepart</h3></div>
+                            <form class="p-4 sm:p-5 space-y-4" id="formStok" onsubmit="return simpanSparepart(event)">
+                                <div><label class="form-label">Nama Sparepart</label><input type="text" class="form-input" id="sNama" placeholder="Contoh: Kapasitor 450V" required></div>
+                                <div class="grid grid-cols-2 gap-3"><div><label class="form-label">Jumlah</label><input type="number" class="form-input" id="sJumlah" placeholder="0" required min="0"></div><div><label class="form-label">Harga (Rp)</label><input type="number" class="form-input" id="sHarga" placeholder="0" required min="0"></div></div>
+                                <div><label class="form-label">Kategori</label><input type="text" class="form-input" id="sKategori" placeholder="Contoh: Kapasitor, IC, Kabel"></div>
+                                <button type="submit" class="btn-primary w-full"><i class="fas fa-plus"></i> Simpan Sparepart</button>
+                            </form>
+                        </div>
+                        <div class="lg:col-span-2">
+                            <!-- ===== STOK SUMMARY ===== -->
+                            <div class="stok-summary" id="stokSummary">
+                                <div class="total-item">
+                                    <span class="label"><i class="fas fa-cubes mr-1"></i> Total Jenis Sparepart</span>
+                                    <span class="value" id="totalJenis">0</span>
+                                </div>
+                                <div class="total-item">
+                                    <span class="label"><i class="fas fa-boxes mr-1"></i> Total Unit Stok</span>
+                                    <span class="value" id="totalUnit">0</span>
+                                </div>
+                                <div class="total-item">
+                                    <span class="label"><i class="fas fa-money-bill-wave mr-1"></i> Total Nilai Stok</span>
+                                    <span class="value total-nilai" id="totalNilai">Rp 0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="data-card">
+                                <div class="p-4 sm:p-5 border-b flex flex-wrap items-center justify-between gap-3" style="border-color:var(--border)">
+                                    <h3 class="font-semibold text-sm">Daftar Stok Sparepart</h3>
+                                    <div class="flex gap-2 flex-wrap">
+                                        <input type="text" class="form-input" style="width:180px;max-width:100%" placeholder="Cari sparepart..." id="searchStok" oninput="renderStok()">
+                                        <button class="btn-success btn-sm" onclick="exportStokExcel()" title="Download Excel Stock Opname">
+                                            <i class="fas fa-file-excel"></i> Download Excel
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Nama</th>
+                                                <th>Kategori</th>
+                                                <th>Stok</th>
+                                                <th>Harga</th>
+                                                <th>Subtotal</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="stokTable"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="page-section" id="page-riwayatstok">
+                    <div class="data-card">
+                        <div class="p-4 sm:p-5 border-b flex flex-wrap items-center justify-between gap-3" style="border-color:var(--border)">
+                            <h3 class="font-semibold text-sm"><i class="fas fa-clock-rotate-left mr-2"></i>Riwayat Sparepart Masuk</h3>
+                            <div class="flex gap-2 flex-wrap">
+                                <input type="date" class="form-input" style="width:150px;max-width:100%" id="riwayatStokDari" onchange="renderRiwayatStok()">
+                                <span class="text-sm" style="color:var(--muted)">s/d</span>
+                                <input type="date" class="form-input" style="width:150px;max-width:100%" id="riwayatStokSampai" onchange="renderRiwayatStok()">
+                                <input type="text" class="form-input" style="width:170px;max-width:100%" placeholder="Cari sparepart..." id="searchRiwayatStok" oninput="renderRiwayatStok()">
+                                <button class="btn-success btn-sm" onclick="exportRiwayatStokExcel()" title="Download Excel Riwayat Stok">
+                                    <i class="fas fa-file-excel"></i> Download Excel
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Sparepart</th>
+                                        <th>Kategori</th>
+                                        <th>Jumlah Masuk</th>
+                                        <th>Harga Satuan</th>
+                                        <th>Total Nilai</th>
+                                        <th>Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="riwayatStokTable"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 sm:p-5 flex justify-end" id="riwayatStokTotal"></div>
+                    </div>
+                </section>
                 <section class="page-section" id="page-riwayat"><div class="data-card"><div class="p-4 sm:p-5 border-b flex flex-wrap items-center justify-between gap-3" style="border-color:var(--border)"><div class="flex items-center gap-3 flex-wrap"><input type="date" class="form-input" style="width:150px;max-width:100%" id="riwayatDari" onchange="renderRiwayat()"><span class="text-sm" style="color:var(--muted)">s/d</span><input type="date" class="form-input" style="width:150px;max-width:100%" id="riwayatSampai" onchange="renderRiwayat()"><input type="text" class="form-input" style="width:170px;max-width:100%" placeholder="Cari..." id="searchRiwayat" oninput="renderRiwayat()"></div></div><div class="overflow-x-auto"><table><thead><tr><th>No. Service</th><th>Tgl Masuk</th><th>Tgl Ambil</th><th>Pelanggan</th><th>Barang</th><th>Total Biaya</th><th>Struk</th></tr></thead><tbody id="riwayatTable"></tbody></table></div></div></section>
                 <section class="page-section" id="page-laporan"><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-4 sm:mb-6" id="laporanStats"></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 mb-4 sm:mb-6"><div class="data-card"><div class="p-4 sm:p-5 border-b" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Pendapatan Bulanan</h3></div><div class="p-4 sm:p-5"><canvas id="monthlyChart" height="250"></canvas></div></div><div class="data-card"><div class="p-4 sm:p-5 border-b" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Jenis Barang Terbanyak</h3></div><div class="p-4 sm:p-5"><canvas id="jenisChart" height="250"></canvas></div></div></div><div class="data-card"><div class="p-4 sm:p-5 border-b flex flex-wrap items-center justify-between gap-3" style="border-color:var(--border)"><h3 class="font-semibold text-sm">Detail Laporan</h3><div class="flex gap-2 flex-wrap"><input type="month" class="form-input" style="width:160px;max-width:100%" id="laporanBulan" onchange="renderLaporan()"><button class="btn-primary btn-sm" onclick="exportLaporanExcel()"><i class="fas fa-file-excel"></i> Download Excel</button></div></div><div class="overflow-x-auto"><table><thead><tr><th>No</th><th>No. Service</th><th>Tanggal</th><th>Pelanggan</th><th>Barang</th><th>Biaya Service</th><th>Sparepart</th><th>Total</th></tr></thead><tbody id="laporanTable"></tbody></table></div><div class="p-4 sm:p-5 flex justify-end" id="laporanTotal"></div></div></section>
             </div>
@@ -235,11 +367,11 @@
     const auth=firebase.auth();
 
     // ===== GLOBAL STATE =====
-    let currentPage='dashboard',allServices=[],allJenis=[],allSparepart=[],selectedAmbilId=null;
+    let currentPage='dashboard',allServices=[],allJenis=[],allSparepart=[],allRiwayatStok=[],selectedAmbilId=null;
     let revenueChartInstance=null,statusChartInstance=null,monthlyChartInstance=null,jenisChartInstance=null;
     let sparepartRowCounter=0,savedSparepartDrafts={};
     let isLoggedIn=false,currentUser=null;
-    let unsubscribeServices=null,unsubscribeJenis=null,unsubscribeSparepart=null;
+    let unsubscribeServices=null,unsubscribeJenis=null,unsubscribeSparepart=null,unsubscribeRiwayatStok=null;
 
     // ===== AUTH =====
     function handleLogin(e){
@@ -297,6 +429,7 @@
             if(unsubscribeServices) unsubscribeServices();
             if(unsubscribeJenis) unsubscribeJenis();
             if(unsubscribeSparepart) unsubscribeSparepart();
+            if(unsubscribeRiwayatStok) unsubscribeRiwayatStok();
             document.getElementById('loginPage').classList.remove('hidden');
             document.getElementById('appLayout').classList.remove('show');
             showToast('Anda telah keluar', 'info');
@@ -368,6 +501,16 @@
             }, (error) => {
                 console.error('Sparepart listener error:', error);
             });
+
+        if(unsubscribeRiwayatStok) unsubscribeRiwayatStok();
+        unsubscribeRiwayatStok = db.collection('riwayatStok')
+            .orderBy('tanggal', 'desc')
+            .onSnapshot((snapshot) => {
+                allRiwayatStok = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                refreshCurrentPage();
+            }, (error) => {
+                console.error('Riwayat Stok listener error:', error);
+            });
     }
 
     function refreshCurrentPage() {
@@ -378,6 +521,7 @@
         else if (currentPage === 'selesai') renderSelesai();
         else if (currentPage === 'jenis') renderJenis();
         else if (currentPage === 'stok') renderStok();
+        else if (currentPage === 'riwayatstok') renderRiwayatStok();
         else if (currentPage === 'riwayat') renderRiwayat();
         else if (currentPage === 'laporan') renderLaporan();
     }
@@ -478,8 +622,140 @@
         showToast('File Excel berhasil diunduh');
     }
 
+    // ===== EXPORT STOK EXCEL (STOCK OPNAME) =====
+    function exportStokExcel(){
+        if(allSparepart.length === 0){
+            showToast('Tidak ada data sparepart untuk diexport','info');
+            return;
+        }
+        
+        let totalUnit = allSparepart.reduce((sum, s) => sum + (Number(s.jumlah) || 0), 0);
+        let totalNilai = allSparepart.reduce((sum, s) => sum + ((Number(s.jumlah) || 0) * (Number(s.harga) || 0)), 0);
+        
+        const excelData = allSparepart.map((s, index) => ({
+            'No': index + 1,
+            'Nama Sparepart': s.nama || '',
+            'Kategori': s.kategori || '',
+            'Jumlah Stok': Number(s.jumlah) || 0,
+            'Harga Satuan (Rp)': Number(s.harga) || 0,
+            'Subtotal (Rp)': (Number(s.jumlah) || 0) * (Number(s.harga) || 0)
+        }));
+        
+        excelData.push({
+            'No': '',
+            'Nama Sparepart': '=== TOTAL ===',
+            'Kategori': '',
+            'Jumlah Stok': totalUnit,
+            'Harga Satuan (Rp)': '',
+            'Subtotal (Rp)': totalNilai
+        });
+        
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(excelData);
+        ws['!cols'] = [
+            { wch: 8 },   // No
+            { wch: 30 },  // Nama Sparepart
+            { wch: 20 },  // Kategori
+            { wch: 15 },  // Jumlah Stok
+            { wch: 20 },  // Harga Satuan
+            { wch: 20 }   // Subtotal
+        ];
+        
+        XLSX.utils.book_append_sheet(wb, ws, 'Stock Opname');
+        const now = new Date();
+        const dateStr = now.getFullYear() + 
+                       String(now.getMonth() + 1).padStart(2, '0') + 
+                       String(now.getDate()).padStart(2, '0');
+        const fileName = `stock_opname_${dateStr}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        showToast('File Excel Stock Opname berhasil diunduh!', 'success');
+    }
+
+    // ===== EXPORT RIWAYAT STOK EXCEL =====
+    function exportRiwayatStokExcel(){
+        const dari = document.getElementById('riwayatStokDari')?.value;
+        const sampai = document.getElementById('riwayatStokSampai')?.value;
+        const search = (document.getElementById('searchRiwayatStok')?.value||'').toLowerCase();
+        
+        let data = allRiwayatStok;
+        
+        if(dari){
+            const d = new Date(dari);
+            data = data.filter(item => {
+                const t = item.tanggal?.toDate ? item.tanggal.toDate() : new Date(item.tanggal);
+                return t >= d;
+            });
+        }
+        if(sampai){
+            const d = new Date(sampai);
+            d.setDate(d.getDate() + 1);
+            data = data.filter(item => {
+                const t = item.tanggal?.toDate ? item.tanggal.toDate() : new Date(item.tanggal);
+                return t < d;
+            });
+        }
+        if(search){
+            data = data.filter(item => 
+                (item.namaSparepart||'').toLowerCase().includes(search) ||
+                (item.kategori||'').toLowerCase().includes(search)
+            );
+        }
+        
+        if(data.length === 0){
+            showToast('Tidak ada data riwayat stok untuk diexport','info');
+            return;
+        }
+        
+        let totalNilai = data.reduce((sum, item) => sum + ((Number(item.jumlah) || 0) * (Number(item.harga) || 0)), 0);
+        let totalUnit = data.reduce((sum, item) => sum + (Number(item.jumlah) || 0), 0);
+        
+        const excelData = data.map((item, index) => ({
+            'No': index + 1,
+            'Tanggal': formatDateTime(item.tanggal),
+            'Sparepart': item.namaSparepart || '',
+            'Kategori': item.kategori || '',
+            'Jumlah Masuk': Number(item.jumlah) || 0,
+            'Harga Satuan (Rp)': Number(item.harga) || 0,
+            'Total Nilai (Rp)': (Number(item.jumlah) || 0) * (Number(item.harga) || 0),
+            'Keterangan': item.keterangan || 'Tambah Stok'
+        }));
+        
+        excelData.push({
+            'No': '',
+            'Tanggal': '=== TOTAL ===',
+            'Sparepart': '',
+            'Kategori': '',
+            'Jumlah Masuk': totalUnit,
+            'Harga Satuan (Rp)': '',
+            'Total Nilai (Rp)': totalNilai,
+            'Keterangan': ''
+        });
+        
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(excelData);
+        ws['!cols'] = [
+            { wch: 6 },   // No
+            { wch: 20 },  // Tanggal
+            { wch: 30 },  // Sparepart
+            { wch: 20 },  // Kategori
+            { wch: 15 },  // Jumlah Masuk
+            { wch: 20 },  // Harga Satuan
+            { wch: 20 },  // Total Nilai
+            { wch: 25 }   // Keterangan
+        ];
+        
+        XLSX.utils.book_append_sheet(wb, ws, 'Riwayat Stok Masuk');
+        const now = new Date();
+        const dateStr = now.getFullYear() + 
+                       String(now.getMonth() + 1).padStart(2, '0') + 
+                       String(now.getDate()).padStart(2, '0');
+        const fileName = `riwayat_stok_masuk_${dateStr}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        showToast('File Excel Riwayat Stok berhasil diunduh!', 'success');
+    }
+
     // ===== NAVIGASI =====
-    function navigate(page){currentPage=page;document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const section=document.getElementById(`page-${page}`);if(section)section.classList.add('active');const navItem=document.querySelector(`.nav-item[data-page="${page}"]`);if(navItem)navItem.classList.add('active');const titles={dashboard:'Dashboard',terima:'Terima Barang',daftar:'Daftar Barang Service',administrasi:'Administrasi',selesai:'Service Selesai',jenis:'Jenis Barang & Biaya Service',stok:'Stok Sparepart',riwayat:'Riwayat Service',laporan:'Laporan'};document.getElementById('pageTitle').textContent=titles[page]||'Dashboard';document.getElementById('sidebar').classList.remove('open');refreshCurrentPage();}
+    function navigate(page){currentPage=page;document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const section=document.getElementById(`page-${page}`);if(section)section.classList.add('active');const navItem=document.querySelector(`.nav-item[data-page="${page}"]`);if(navItem)navItem.classList.add('active');const titles={dashboard:'Dashboard',terima:'Terima Barang',daftar:'Daftar Barang Service',administrasi:'Administrasi',selesai:'Service Selesai',jenis:'Jenis Barang & Biaya Service',stok:'Stok Sparepart',riwayatstok:'Riwayat Stok Masuk',riwayat:'Riwayat Service',laporan:'Laporan'};document.getElementById('pageTitle').textContent=titles[page]||'Dashboard';document.getElementById('sidebar').classList.remove('open');refreshCurrentPage();}
 
     // ===== DASHBOARD =====
     function renderDashboard(){const tM=allServices.length,tP=allServices.filter(s=>s.status==='proses').length,tS=allServices.filter(s=>s.status==='selesai').length,tD=allServices.filter(s=>s.status==='diambil'),pn=tD.reduce((a,s)=>a+(Number(s.biayaService||0)+Number(s.biayaSparepart||0)),0);document.getElementById('dashStats').innerHTML=`<div class="stat-card"><div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(6,182,212,0.15)"><i class="fas fa-boxes-stacked" style="color:#06B6D4"></i></div><span class="text-xs font-mono" style="color:var(--muted)">TOTAL</span></div><p class="text-2xl font-bold">${tM}</p><p class="text-xs mt-1" style="color:var(--muted)">Barang Diterima</p></div><div class="stat-card"><div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(245,158,11,0.15)"><i class="fas fa-gears" style="color:#F59E0B"></i></div><span class="text-xs font-mono" style="color:var(--muted)">AKTIF</span></div><p class="text-2xl font-bold">${tP}</p><p class="text-xs mt-1" style="color:var(--muted)">Sedang Dikerjakan</p></div><div class="stat-card"><div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(16,185,129,0.15)"><i class="fas fa-circle-check" style="color:#10B981"></i></div><span class="text-xs font-mono" style="color:var(--muted)">SIAP</span></div><p class="text-2xl font-bold">${tS}</p><p class="text-xs mt-1" style="color:var(--muted)">Siap Diambil</p></div><div class="stat-card"><div class="flex items-center justify-between mb-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(16,185,129,0.15)"><i class="fas fa-money-bill-wave" style="color:#34D399"></i></div><span class="text-xs font-mono" style="color:var(--muted)">POMAS</span></div><p class="text-2xl font-bold">${formatRupiah(pn)}</p><p class="text-xs mt-1" style="color:var(--muted)">Total Pendapatan</p></div>`;const rc=allServices.slice(0,5);document.getElementById('dashRecentTable').innerHTML=rc.length?rc.map(s=>`<tr><td class="font-mono text-xs" style="color:var(--accent)">${s.noService}</td><td>${s.namaPelanggan}</td><td>${s.merek||'-'}</td><td>${statusBadge(s.status)}</td><td class="text-xs" style="color:var(--muted)">${formatDate(s.tanggalMasuk)}</td></tr>`).join(''):'<tr><td colspan="5" class="text-center py-8" style="color:var(--muted)">Belum ada data</td></tr>';renderRevenueChart();renderStatusChart();}
@@ -509,12 +785,10 @@
             
             let aksiButtons = '';
             if(isLocked) {
-                // Data terkunci - TIDAK ADA tombol PDF, hanya indikator FINAL
                 aksiButtons = `
                     <span class="btn-locked" title="Data terkunci - Status sudah DIAMBIL"><i class="fas fa-lock"></i> Final</span>
                 `;
             } else {
-                // Data bisa diedit - Ada tombol Edit, PDF, dan Hapus
                 aksiButtons = `
                     <button class="btn-secondary btn-sm" onclick="editService('${s.id}')" title="Edit"><i class="fas fa-pen"></i></button>
                     <button class="btn-warn" onclick="downloadBuktiTitip(allServices.find(x=>x.id==='${s.id}'))" title="PDF"><i class="fas fa-file-pdf"></i></button>
@@ -566,13 +840,10 @@
     function editService(id){
         const s=allServices.find(x=>x.id===id);
         if(!s) return;
-        
-        // Cek apakah data terkunci
         if(s.status==='diambil'){
             showToast('Data ini sudah DIAMBIL dan tidak dapat diedit!', 'error');
             return;
         }
-        
         openModal('Edit Service',`<form id="formEditService" class="space-y-4" onsubmit="return simpanEditService(event,'${id}')">
             <div><label class="form-label">Nama Pelanggan</label><input type="text" class="form-input" id="eNama" value="${s.namaPelanggan}" required></div>
             <div><label class="form-label">No. Telepon</label><input type="tel" class="form-input" id="eTelp" value="${s.noTelp||''}"></div>
@@ -594,7 +865,6 @@
             closeModal();
             return false;
         }
-        
         const ud={
             namaPelanggan:document.getElementById('eNama').value.trim(),
             noTelp:document.getElementById('eTelp').value.trim(),
@@ -776,14 +1046,179 @@
     async function hapusJenis(id){if(!confirm('Yakin hapus?'))return;try{await db.collection('jenisBarang').doc(id).delete();showToast('Dihapus');}catch(err){showToast('Gagal: '+err.message,'error');}}
 
     // ===== STOK SPAREPART =====
-    function renderStok(){const search=(document.getElementById('searchStok')?.value||'').toLowerCase();let data=allSparepart;if(search)data=data.filter(s=>s.nama.toLowerCase().includes(search)||(s.kategori||'').toLowerCase().includes(search));const tb=document.getElementById('stokTable');if(data.length===0){tb.innerHTML='<tr><td colspan="5" class="text-center py-8" style="color:var(--muted)">Tidak ada data</td></tr>';}else{tb.innerHTML=data.map(s=>{const sr=Number(s.jumlah)<=5;return`<tr><td class="font-semibold">${s.nama}</td><td class="text-sm" style="color:var(--muted)">${s.kategori||'-'}</td><td><span class="font-mono font-bold" style="${sr?'color:var(--danger)':'color:var(--accent)'}">${s.jumlah}</span>${sr?'<span class="ml-2 text-xs" style="color:var(--danger)"><i class="fas fa-exclamation-triangle"></i></span>':''}</td><td class="font-mono">${formatRupiah(s.harga)}</td><td><div class="flex gap-1"><button class="btn-secondary btn-sm" onclick="editSparepart('${s.id}')"><i class="fas fa-pen"></i></button><button class="btn-secondary btn-sm" onclick="tambahStok('${s.id}')"><i class="fas fa-plus"></i></button><button class="btn-danger btn-sm" onclick="hapusSparepart('${s.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`;}).join('');}}
-    async function simpanSparepart(e){e.preventDefault();try{await db.collection('sparepart').add({nama:document.getElementById('sNama').value.trim(),jumlah:Number(document.getElementById('sJumlah').value)||0,harga:Number(document.getElementById('sHarga').value)||0,kategori:document.getElementById('sKategori').value.trim()});showToast('Sparepart ditambahkan');document.getElementById('formStok').reset();}catch(err){showToast('Gagal: '+err.message,'error');}return false;}
+    function renderStok(){
+        const search=(document.getElementById('searchStok')?.value||'').toLowerCase();
+        let data=allSparepart;
+        if(search)data=data.filter(s=>s.nama.toLowerCase().includes(search)||(s.kategori||'').toLowerCase().includes(search));
+        const tb=document.getElementById('stokTable');
+        
+        let totalJenis = allSparepart.length;
+        let totalUnit = allSparepart.reduce((sum, s) => sum + (Number(s.jumlah) || 0), 0);
+        let totalNilai = allSparepart.reduce((sum, s) => sum + ((Number(s.jumlah) || 0) * (Number(s.harga) || 0)), 0);
+        
+        document.getElementById('totalJenis').textContent = totalJenis;
+        document.getElementById('totalUnit').textContent = totalUnit;
+        document.getElementById('totalNilai').textContent = formatRupiah(totalNilai);
+        
+        if(data.length===0){
+            tb.innerHTML='<tr><td colspan="7" class="text-center py-8" style="color:var(--muted)">Tidak ada data</td></tr>';
+            return;
+        }
+        tb.innerHTML=data.map((s, index)=>{
+            const sr=Number(s.jumlah)<=5;
+            const subtotal = (Number(s.jumlah) || 0) * (Number(s.harga) || 0);
+            return`<tr>
+                <td class="text-xs" style="color:var(--muted)">${index + 1}</td>
+                <td class="font-semibold">${s.nama}</td>
+                <td class="text-sm" style="color:var(--muted)">${s.kategori||'-'}</td>
+                <td><span class="font-mono font-bold" style="${sr?'color:var(--danger)':'color:var(--accent)'}">${s.jumlah}</span>${sr?'<span class="ml-2 text-xs" style="color:var(--danger)"><i class="fas fa-exclamation-triangle"></i></span>':''}</td>
+                <td class="font-mono">${formatRupiah(s.harga)}</td>
+                <td class="font-mono font-semibold" style="color:var(--accent2)">${formatRupiah(subtotal)}</td>
+                <td><div class="flex gap-1"><button class="btn-secondary btn-sm" onclick="editSparepart('${s.id}')"><i class="fas fa-pen"></i></button><button class="btn-secondary btn-sm" onclick="tambahStok('${s.id}')"><i class="fas fa-plus"></i></button><button class="btn-danger btn-sm" onclick="hapusSparepart('${s.id}')"><i class="fas fa-trash"></i></button></div></td>
+            </tr>`;
+        }).join('');
+    }
+
+    async function simpanSparepart(e){
+        e.preventDefault();
+        const nama = document.getElementById('sNama').value.trim();
+        const jumlah = Number(document.getElementById('sJumlah').value) || 0;
+        const harga = Number(document.getElementById('sHarga').value) || 0;
+        const kategori = document.getElementById('sKategori').value.trim();
+        
+        try{
+            // Tambah ke koleksi sparepart
+            const docRef = await db.collection('sparepart').add({
+                nama: nama,
+                jumlah: jumlah,
+                harga: harga,
+                kategori: kategori
+            });
+            
+            // Catat ke riwayat stok masuk
+            await db.collection('riwayatStok').add({
+                sparepartId: docRef.id,
+                namaSparepart: nama,
+                kategori: kategori,
+                jumlah: jumlah,
+                harga: harga,
+                tanggal: firebase.firestore.FieldValue.serverTimestamp(),
+                keterangan: 'Tambah Stok Baru'
+            });
+            
+            showToast('Sparepart ditambahkan dan dicatat di riwayat!');
+            document.getElementById('formStok').reset();
+        }catch(err){
+            showToast('Gagal: '+err.message,'error');
+        }
+        return false;
+    }
+
+    async function tambahStok(id){
+        const s=allSparepart.find(x=>x.id===id);
+        if(!s)return;
+        const t=prompt(`Tambah stok "${s.nama}" (saat ini: ${s.jumlah}):`,'1');
+        if(!t||isNaN(t)) return;
+        const jumlahBaru = Number(t);
+        if(jumlahBaru <= 0){
+            showToast('Jumlah harus lebih dari 0','error');
+            return;
+        }
+        try{
+            await db.collection('sparepart').doc(id).update({
+                jumlah: Number(s.jumlah) + jumlahBaru
+            });
+            
+            // Catat ke riwayat stok masuk
+            await db.collection('riwayatStok').add({
+                sparepartId: id,
+                namaSparepart: s.nama,
+                kategori: s.kategori || '',
+                jumlah: jumlahBaru,
+                harga: Number(s.harga),
+                tanggal: firebase.firestore.FieldValue.serverTimestamp(),
+                keterangan: 'Tambah Stok'
+            });
+            
+            showToast(`Stok +${jumlahBaru} - Dicatat di riwayat`);
+        }catch(err){
+            showToast('Gagal: '+err.message,'error');
+        }
+    }
+
     function editSparepart(id){const s=allSparepart.find(x=>x.id===id);if(!s)return;openModal('Edit Sparepart',`<form class="space-y-4" onsubmit="return simpanEditSparepart(event,'${id}')"><div><label class="form-label">Nama</label><input type="text" class="form-input" id="esNama" value="${s.nama}" required></div><div class="grid grid-cols-2 gap-3"><div><label class="form-label">Jumlah</label><input type="number" class="form-input" id="esJumlah" value="${s.jumlah}" required min="0"></div><div><label class="form-label">Harga (Rp)</label><input type="number" class="form-input" id="esHarga" value="${s.harga}" required min="0"></div></div><div><label class="form-label">Kategori</label><input type="text" class="form-input" id="esKategori" value="${s.kategori||''}"></div><div class="flex gap-3"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> Simpan</button><button type="button" class="btn-secondary" onclick="closeModal()">Batal</button></div></form>`);}
     async function simpanEditSparepart(e,id){e.preventDefault();try{await db.collection('sparepart').doc(id).update({nama:document.getElementById('esNama').value.trim(),jumlah:Number(document.getElementById('esJumlah').value)||0,harga:Number(document.getElementById('esHarga').value)||0,kategori:document.getElementById('esKategori').value.trim()});showToast('Diperbarui');closeModal();}catch(err){showToast('Gagal: '+err.message,'error');}return false;}
-    async function tambahStok(id){const s=allSparepart.find(x=>x.id===id);if(!s)return;const t=prompt(`Tambah stok "${s.nama}" (saat ini: ${s.jumlah}):`,'1');if(!t||isNaN(t))return;try{await db.collection('sparepart').doc(id).update({jumlah:Number(s.jumlah)+Number(t)});showToast(`Stok +${t}`);}catch(err){showToast('Gagal: '+err.message,'error');}}
     async function hapusSparepart(id){if(!confirm('Yakin hapus?'))return;try{await db.collection('sparepart').doc(id).delete();showToast('Dihapus');}catch(err){showToast('Gagal: '+err.message,'error');}}
 
-    // ===== RIWAYAT =====
+    // ===== RIWAYAT STOK MASUK =====
+    function renderRiwayatStok(){
+        const dari = document.getElementById('riwayatStokDari')?.value;
+        const sampai = document.getElementById('riwayatStokSampai')?.value;
+        const search = (document.getElementById('searchRiwayatStok')?.value||'').toLowerCase();
+        
+        let data = allRiwayatStok;
+        
+        if(dari){
+            const d = new Date(dari);
+            data = data.filter(item => {
+                const t = item.tanggal?.toDate ? item.tanggal.toDate() : new Date(item.tanggal);
+                return t >= d;
+            });
+        }
+        if(sampai){
+            const d = new Date(sampai);
+            d.setDate(d.getDate() + 1);
+            data = data.filter(item => {
+                const t = item.tanggal?.toDate ? item.tanggal.toDate() : new Date(item.tanggal);
+                return t < d;
+            });
+        }
+        if(search){
+            data = data.filter(item => 
+                (item.namaSparepart||'').toLowerCase().includes(search) ||
+                (item.kategori||'').toLowerCase().includes(search)
+            );
+        }
+        
+        const tbody = document.getElementById('riwayatStokTable');
+        if(data.length === 0){
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8" style="color:var(--muted)">Tidak ada riwayat stok masuk</td></tr>';
+            document.getElementById('riwayatStokTotal').innerHTML = '';
+            return;
+        }
+        
+        let totalUnit = 0;
+        let totalNilai = 0;
+        
+        tbody.innerHTML = data.map(item => {
+            const unit = Number(item.jumlah) || 0;
+            const harga = Number(item.harga) || 0;
+            const subtotal = unit * harga;
+            totalUnit += unit;
+            totalNilai += subtotal;
+            
+            return `<tr>
+                <td class="text-xs" style="color:var(--muted)">${formatDateTime(item.tanggal)}</td>
+                <td class="font-semibold">${item.namaSparepart || '-'}</td>
+                <td class="text-sm" style="color:var(--muted)">${item.kategori || '-'}</td>
+                <td class="font-mono font-bold" style="color:var(--accent)">${unit}</td>
+                <td class="font-mono">${formatRupiah(harga)}</td>
+                <td class="font-mono font-semibold" style="color:var(--accent2)">${formatRupiah(subtotal)}</td>
+                <td class="text-xs" style="color:var(--muted)">${item.keterangan || 'Tambah Stok'}</td>
+            </tr>`;
+        }).join('');
+        
+        document.getElementById('riwayatStokTotal').innerHTML = `
+            <div class="text-right">
+                <span class="text-sm" style="color:var(--muted)">Total Unit Masuk: </span>
+                <span class="text-lg font-bold" style="color:var(--accent)">${totalUnit}</span>
+                <span class="text-sm ml-4" style="color:var(--muted)">Total Nilai: </span>
+                <span class="text-lg font-bold" style="color:var(--accent)">${formatRupiah(totalNilai)}</span>
+            </div>
+        `;
+    }
+
+    // ===== RIWAYAT SERVICE =====
     function renderRiwayat(){const dari=document.getElementById('riwayatDari')?.value,sampai=document.getElementById('riwayatSampai')?.value,search=(document.getElementById('searchRiwayat')?.value||'').toLowerCase();let data=allServices.filter(s=>s.status==='diambil');if(dari){const d=new Date(dari);data=data.filter(s=>{const t=s.tanggalAmbil?.toDate?s.tanggalAmbil.toDate():null;return t&&t>=d;});}if(sampai){const d=new Date(sampai);d.setDate(d.getDate()+1);data=data.filter(s=>{const t=s.tanggalAmbil?.toDate?s.tanggalAmbil.toDate():null;return t&&t<d;});}if(search)data=data.filter(s=>(s.noService||'').toLowerCase().includes(search)||(s.namaPelanggan||'').toLowerCase().includes(search));const tb=document.getElementById('riwayatTable');if(data.length===0){tb.innerHTML='<tr><td colspan="7" class="text-center py-8" style="color:var(--muted)">Tidak ada riwayat</td></tr>';}else{tb.innerHTML=data.map(s=>{const tl=Number(s.biayaService||0)+Number(s.biayaSparepart||0);return`<tr><td class="font-mono text-xs" style="color:var(--accent)">${s.noService}</td><td class="text-xs">${formatDate(s.tanggalMasuk)}</td><td class="text-xs">${formatDate(s.tanggalAmbil)}</td><td>${s.namaPelanggan}</td><td>${s.jenisBarang} - ${s.merek}</td><td class="font-mono font-semibold">${formatRupiah(tl)}</td><td><div class="flex gap-1"><button class="btn-secondary btn-sm" onclick="lihatStrukRiwayat('${s.id}')" title="Lihat"><i class="fas fa-receipt"></i></button><button class="btn-info-sm" onclick="downloadStrukRiwayatPDF('${s.id}')" title="PDF"><i class="fas fa-file-pdf"></i></button></div></td></tr>`;}).join('');}}
     function lihatStrukRiwayat(id){const s=allServices.find(x=>x.id===id);if(!s)return;const tl=Number(s.biayaService||0)+Number(s.biayaSparepart||0);let sd='';if(s.sparepartDigunakan&&s.sparepartDigunakan.length>0){sd='<div class="divider"></div><p style="font-weight:bold;margin-bottom:4px">Sparepart:</p>';s.sparepartDigunakan.forEach(sp=>{sd+=`<p>- ${sp.nama} x${sp.qty} = ${formatRupiah(sp.subtotal)}</p>`;});}openModal('Struk Service',`<div class="receipt-box"><h3>SERVICE ELEKTRONIK</h3><p style="text-align:center;font-size:10px;color:#666">Jl. R.W. Monginsidi - Bhoanawa - Ende - Hp : 085333071119</p><div class="divider"></div><p>No : ${s.noService}</p><p>Tgl: ${formatDate(s.tanggalAmbil)}</p><div class="divider"></div><p>Pelanggan: ${s.namaPelanggan}</p><p>Alamat   : ${s.alamat||'-'}</p><p>Barang   : ${s.jenisBarang}</p><p>Merek    : ${s.merek}</p><p>Type     : ${s.typeBarang||'-'}</p><p>No. Seri : ${s.noSeri||'-'}</p><p>Kelengkapan: ${s.kelengkapan||'-'}</p><p>Keluhan  : ${s.keluhan}</p>${s.catatanTeknisi?`<p>Catatan  : ${s.catatanTeknisi}</p>`:''}${sd}<div class="divider"></div><p>Biaya Service  : ${formatRupiah(s.biayaService)}</p><p>Biaya Sparepart: ${formatRupiah(s.biayaSparepart)}</p><div class="divider"></div><p style="font-size:14px;font-weight:bold">TOTAL: ${formatRupiah(tl)}</p><div class="divider"></div><p style="text-align:center;font-size:10px;color:#666">Terima kasih atas kepercayaan Anda</p></div>`);}
 
@@ -795,7 +1230,7 @@
     function updateClock(){document.getElementById('clockDisplay').textContent=new Date().toLocaleTimeString('id-ID');}setInterval(updateClock,1000);updateClock();
 
     // ===== INIT =====
-    function initApp(){const nw=new Date();document.getElementById('laporanBulan').value=`${nw.getFullYear()}-${String(nw.getMonth()+1).padStart(2,'0')}`;document.getElementById('riwayatDari').value=`${nw.getFullYear()}-${String(nw.getMonth()+1).padStart(2,'0')}-01`;}
+    function initApp(){const nw=new Date();document.getElementById('laporanBulan').value=`${nw.getFullYear()}-${String(nw.getMonth()+1).padStart(2,'0')}`;document.getElementById('riwayatDari').value=`${nw.getFullYear()}-${String(nw.getMonth()+1).padStart(2,'0')}-01`;document.getElementById('riwayatStokDari').value=`${nw.getFullYear()}-${String(nw.getMonth()+1).padStart(2,'0')}-01`;}
 
     loadTheme();
     </script>
